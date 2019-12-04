@@ -4,8 +4,8 @@
 CPP      = g++.exe -D__DEBUG__
 CC       = gcc.exe -D__DEBUG__
 WINDRES  = windres.exe
-OBJ      = main.o storage.o Untitled1.o
-LINKOBJ  = main.o storage.o Untitled1.o
+OBJ      = main.o storage.o
+LINKOBJ  = main.o storage.o
 LIBS     = -L"C:/code cpp/Dev-Cpp/MinGW64/lib" -L"C:/code cpp/Dev-Cpp/MinGW64/x86_64-w64-mingw32/lib" -static-libgcc -g3 -s
 INCS     = -I"C:/code cpp/Dev-Cpp/MinGW64/include" -I"C:/code cpp/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/code cpp/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include"
 CXXINCS  = -I"C:/code cpp/Dev-Cpp/MinGW64/include" -I"C:/code cpp/Dev-Cpp/MinGW64/x86_64-w64-mingw32/include" -I"C:/code cpp/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include" -I"C:/code cpp/Dev-Cpp/MinGW64/lib/gcc/x86_64-w64-mingw32/4.9.2/include/c++"
@@ -29,6 +29,3 @@ main.o: main.c
 
 storage.o: storage.c
 	$(CC) -c storage.c -o storage.o $(CFLAGS)
-
-Untitled1.o: Untitled1.c
-	$(CC) -c Untitled1.c -o Untitled1.o $(CFLAGS)

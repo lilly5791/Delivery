@@ -59,6 +59,23 @@ static void initStorage(int x, int y) {
 //return : 0 - password is matching, -1 - password is not matching
 static int inputPasswd(int x, int y) {
 	
+	int index; // index is for compare the password. if index = 0 then match, if index = -1 then wrong
+	char pass[PASSWD_LEN+1];
+	
+	printf("input password for (%d, %d) storage :", x, y);
+	scanf("%s", &pass);
+	
+	index = strcmp(pass, deliverySystem[x][y].passwd);
+	
+	if(index == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+	
 }
 
 
@@ -91,9 +108,11 @@ int str_backupSystem(char* filepath) {
 			if(deliverySystem[i][j].cnt == 1)
 			{
 				fprintf(fp, deliverySystem[i][j].building);
-				//fprint(fp, " ");
+				fprint(fp, " ");
 				fprintf(fp, deliverySystem[i][j].room);
+				fprint(fp, " ");
 				fprintf(fp, deliverySystem[i][j].passwd);
+				fprint(fp, " ");
 				fprintf(fp, deliverySystem[i][j].context);
 			}
 		}
@@ -202,6 +221,7 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 		deliverySystem[x][y].passwd = passwd[PASSWD_LEN+1];
 		
 		deliverySystem[x][y].cnt++;
+		storedCnt++;
 		return 0;
 	}
 
@@ -223,6 +243,31 @@ int str_extractStorage(int x, int y) {
 //int nBuilding, int nRoom : my building/room numbers
 //return : number of packages that the storage system has
 int str_findStorage(int nBuilding, int nRoom) {
+	
+	int i, j;
+	
+	for (i=0;i<systemSize[0];i++)
+	{
+		for (j=0;j<systemSize[1];j++)
+		{
+			if (deliverySystem[i][j].cnt > 0) // if resident has some packagem then show 
+			{
+				if(nBuilding && nRoom is in memojang)
+				{
+					printf("-----------> Found a package in (%d, %d)\n", i, j);
+				}
+				else // when there is no resisdent information then the resident failed to find her package
+				{
+					return 0; 
+				}
+	
+			}
+			else // cnt == 0 means no package
+			{
+				return 0; // 0 = failed to find my package
+			}
+		}
+	}
 	
 	return cnt;
 }
