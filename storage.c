@@ -51,31 +51,13 @@ static void printStorageInside(int x, int y) {
 //and allocate memory to the context pointer
 //int x, int y : cell coordinate to be initialized
 static void initStorage(int x, int y) {
-	
-	int i, j;
-	
-	deliverySystem = (storage_t**)malloc(sizeof(storage_t*)*x); // create row
-    
-    for(i=0;i<x;i++)
-    {
-        deliverySystem[i] = (storage_t*)malloc(sizeof(storage_t)*y); // create column
-    }
-    
-	
-	for(i=0;i<x; i++)
-   {
-    	for(j=0;j<y; j++)
-    	{
-    		deliverySystem[i][j].building = 0;
-    		deliverySystem[i][j].room = 0;
-    		strcpy(deliverySystem[i][j].passwd, "aaaa");
-    		deliverySystem[i][j].cnt = 0;
-    		deliverySystem[i][j].context = (char*)malloc(sizeof(char)*20);
-    		strcpy(deliverySystem[i][j].context, "bbbb");
-		}
-	}
-      
-	
+
+    	deliverySystem[x][y].building = 0;
+    	deliverySystem[x][y].room = 0;
+    	strcpy(deliverySystem[x][y].passwd, "pass");
+   		deliverySystem[x][y].cnt = 0;
+   		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*20);
+   		strcpy(deliverySystem[x][y].context, "context");
 	
 }
 
@@ -161,7 +143,22 @@ int str_createSystem(char* filepath) {
     fp   = fopen(filepath, "r");
     fscanf( fp, "%d %d", &systemSize[0], &systemSize[1]); // accept row, column
     
-    initStorage(systemSize[0], systemSize[1]); // initialize the delivery box before creating struct srorage_t
+    
+	deliverySystem = (storage_t**)malloc(sizeof(storage_t*)*systemSize[0]); // create row
+    
+    for(i=0;i<systemSize[0];i++)
+    {
+        deliverySystem[i] = (storage_t*)malloc(sizeof(storage_t)*systemSize[1]); // create column
+    }
+    
+    for(i=0;i<systemSize[0];i++)
+    {
+    	for(j=0;j<systemSize[1];j++)
+    	{
+    		 initStorage(i, j); // initialize the delivery box before creating struct srorage_t
+		}
+	}
+   
     
     //this sets masterPassword
     fscanf(fp, "%s", masterPassword);
@@ -299,18 +296,19 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 //return : 0 - successfully extracted, -1 = failed to extract
 int str_extractStorage(int x, int y) {
 	
-	int inputPasswd[10];
+	char inputPasswd[10];
 	
 	printf("input password for (%d, %d) storage :", x, y);
-	inputPasswd[10] = getIntegerInput();
+	scanf("%s", inputPasswd);
+
 	
 //	inputPasswd(x, y)
 	if(strcmp(deliverySystem[x][y].passwd, inputPasswd))
 	{
 		printf("extracting the storage (%d, %d)...\n", x, y);
 		printStorageInside(x, y);
-		deliverySystem[x][y].cnt = 0;
 		storedCnt--;
+		initStorage(x, y);
 		return 0;
 	}
 	else
