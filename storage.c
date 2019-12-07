@@ -269,6 +269,8 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 	
 	int i;
 	
+	
+	
 	if(deliverySystem[x][y].cnt == 0)
 	{
 		deliverySystem[x][y].building = nBuilding;
@@ -279,7 +281,7 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 			deliverySystem[x][y].passwd[i] = passwd[i];
 		}
 		
-		deliverySystem[x][y].cnt++;
+		deliverySystem[x][y].cnt=1;
 		storedCnt++;
 	}
 	else
@@ -297,7 +299,23 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 //return : 0 - successfully extracted, -1 = failed to extract
 int str_extractStorage(int x, int y) {
 	
-	storedCnt--;
+	int inputPasswd[10];
+	
+	printf("input password for (%d, %d) storage :", x, y);
+	inputPasswd[10] = getIntegerInput();
+	
+//	inputPasswd(x, y)
+	if(strcmp(deliverySystem[x][y].passwd, inputPasswd))
+	{
+		printf("extracting the storage (%d, %d)...\n", x, y);
+		printStorageInside(x, y);
+		deliverySystem[x][y].cnt = 0;
+		storedCnt--;
+		return 0;
+	}
+	else
+		return -1;
+
 }
 
 //find my package from the storage
@@ -307,29 +325,26 @@ int str_extractStorage(int x, int y) {
 int str_findStorage(int nBuilding, int nRoom) {
 	
 	int i, j;
+	int check = 0;
 	
 	for (i=0;i<systemSize[0];i++)
 	{
 		for (j=0;j<systemSize[1];j++)
 		{
-			if (deliverySystem[i][j].cnt > 0) // if resident has some packagem then show 
+			if(nBuilding == deliverySystem[i][j].building && nRoom == deliverySystem[i][j].room)
 			{
-				if(nBuilding == deliverySystem[i][j].building && nRoom == deliverySystem[i][j].room)
-				{
-					printf("-----------> Found a package in (%d, %d)\n", i, j);
-					return 1;
-				}
-				else // when there is no resisdent information then the resident failed to find her package
-				{
-					return 0; 
-				}
-	
-			}
-			else // cnt == 0 means no package
-			{
-				return 0; // 0 = failed to find my package
+				printf("-----------> Found a package in (%d, %d)\n", i, j);
+				check++;
 			}
 		}
 	}
+	
+	
+	
+	if(check == 0)
+	{
+		return 0;
+	}
+	
 	return 1;
 }

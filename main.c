@@ -7,7 +7,6 @@
 #define N_ROOM					10
 
 #define STORAGE_FILEPATH 		"storage.txt"
-#define STORAGE_FILEPATH2 		"storage2.txt"
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
@@ -194,7 +193,7 @@ int main(int argc, char *argv[]) {
 		
 		
         //backup the status of the storage
-		if (str_backupSystem(STORAGE_FILEPATH2) != 0)
+		if (str_backupSystem(STORAGE_FILEPATH) != 0)
 		{
 			printf("[WARNING] failed to backup the delivery system!\n");
 		}
