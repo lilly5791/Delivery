@@ -52,6 +52,30 @@ static void printStorageInside(int x, int y) {
 //int x, int y : cell coordinate to be initialized
 static void initStorage(int x, int y) {
 	
+	int i, j;
+	
+	deliverySystem = (storage_t**)malloc(sizeof(storage_t*)*x); // create row
+    printf("malloc check\n");
+    
+    for(i=0;i<x;i++)
+    {
+        deliverySystem[i] = (storage_t*)malloc(sizeof(storage_t)*y); // create column
+    }
+    
+	
+	for(i=0;i<x; i++)
+   {
+    	for(j=0;j<y; j++)
+    	{
+    		deliverySystem[i][j].building = 0;
+    		deliverySystem[i][j].room = 0;
+    		strcpy(deliverySystem[i][j].passwd, "aaaa");
+    		deliverySystem[i][j].cnt = 0;
+    		deliverySystem[i][j].context = (char*)malloc(sizeof(char)*20);
+    		strcpy(deliverySystem[i][j].context, "bbbb");
+		}
+	}
+      
 	
 	
 }
@@ -91,37 +115,36 @@ static int inputPasswd(int x, int y) {
 //return : 0 - backup was successfully done, -1 - failed to backup
 int str_backupSystem(char* filepath) {
 	FILE *fp;
-	int i,j;
+   int i,j;
 
-	fp = fopen(filepath, "w");
-	
-	if(fp == NULL) // if exception
-	{	
-		return -1;
-	}
-	
-	fprintf(fp, "%d %d", systemSize[0], systemSize[1]);
-	fprintf(fp, "%s", masterPassword);
-	
-	for(i=0;i<systemSize[0]; i++)
-	{
-		for(j=0;j<systemSize[1]; j++)
-		{
-			if(deliverySystem[i][j].cnt == 1)
-			{
-				fprintf(fp, "%d %d %s ",deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd);
+   fp = fopen(filepath, "w");
+   
+   if(fp == NULL) // if exception
+   {
+      return -1;
+   }
+   
+   fprintf(fp, "%d %d\n", systemSize[0], systemSize[1]);
+   fprintf(fp, "%s\n", masterPassword);
+   
+   for(i=0;i<systemSize[0]; i++)
+   {
+      for(j=0;j<systemSize[1]; j++)
+      {
+         if(deliverySystem[i][j].cnt > 0)
+         {
+            fprintf(fp, "%d %d %d %d %s ",i,j,deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd);
 
-				fprintf(fp, "%s\n",deliverySystem[i][j].context);
-			}
-			
-		}
-		
-	}
-	
-	
-	fclose(fp);
-	
-	return 0;
+            fprintf(fp, "%s\n",deliverySystem[i][j].context);
+         }
+         
+      }
+      
+   }
+   
+   fclose(fp);
+   
+   return 0;
 }
 
 
@@ -138,46 +161,51 @@ int str_createSystem(char* filepath) {
     //this makes deliverySystem dimension array (like delivery box)
     fp   = fopen(filepath, "r");
     fscanf( fp, "%d %d", &systemSize[0], &systemSize[1]);
-    printf("row column check\n");
+    initStorage(systemSize[0], systemSize[1]);
+	printf("row column check\n");
     printf("%d %d\n", systemSize[0], systemSize[1]);
     
         //this sets masterPassword
     fscanf(fp, "%s", masterPassword);
     printf("%s master check\n", masterPassword);
 
-    deliverySystem = (storage_t**)malloc(sizeof(storage_t*)*systemSize[1]); // create row
-    printf("malloc check\n");
+
+//    deliverySystem = (storage_t**)malloc(sizeof(storage_t*)*systemSize[0]); // create row
+//    printf("malloc check\n");
+//    
+//    for(i=0;i<systemSize[0];i++)
+//    {
+//        deliverySystem[i] = (storage_t*)malloc(sizeof(storage_t)*systemSize[1]); // create column
+//    }
+//    
+    printf("malloc second check\n");
     
-    for(i=0;i<systemSize[0];i++)
-    {
-        deliverySystem[i] = (storage_t*)malloc(sizeof(storage_t)*systemSize[1]); // create column
-    }
-     printf("malloc second check\n");
     
-    
-    while( 1 ) // if file is available
+    while(!feof(fp)) // if file is available
     {
         //this is about delivery information
         //ex: 0 0 3 103 1234 noPassword
         //from building number to passwd
+        
         fscanf( fp, "%d %d", &x, &y);//row, column
+
         fscanf( fp, "%d %d %s", &deliverySystem[x][y].building, &deliverySystem[x][y].room, deliverySystem[x][y].passwd);//building, room, passwd
-        printf("from row to passwd in building\n");
+        deliverySystem[x][y].cnt = 1;
+        printf("cnt check %d\n", deliverySystem[x][y].cnt);
+        printf("put from row to passwd in building\n");
         //for checking. delete latesly
         printf("%d\n",deliverySystem[x][y].building);
         printf("%d\n",deliverySystem[x][y].room);
     	printf("%s\n",deliverySystem[x][y].passwd);
         //context
-        deliverySystem[x][y].context = (char*)malloc(sizeof(char)*20);
+//        deliverySystem[x][y].context = (char*)malloc(sizeof(char)*20);
         printf("malloc context check\n");
         fscanf(fp,"%s",deliverySystem[x][y].context);
         printf("context check\n");
-        deliverySystem[x][y].cnt++;
-        //for checking. delete latesly
-    	printf("%s\n",deliverySystem[x][y].context);
+        printf("%s\n",deliverySystem[x][y].context);
 
-        if(feof(fp))
-        	break;
+        //for checking. delete latesly
+		storedCnt++;
         
     }
         
@@ -188,6 +216,53 @@ int str_createSystem(char* filepath) {
 //            free(deliverySystem[i][j].context);
 //        }
 //    }
+    
+    //this is tempor for cheking cnt
+		for(i=0; i<systemSize[0]; i++)
+		{
+			for(j=0; j<systemSize[1]; j++)
+			{
+				printf("%d ", deliverySystem[i][j].cnt);
+			}
+			printf("\n");
+		}
+    
+    
+    for(i=0; i<systemSize[0]; i++)
+		{
+			for(j=0; j<systemSize[1]; j++)
+			{
+				printf("%s ", deliverySystem[i][j].passwd);
+			}
+			printf("\n");
+		}
+		
+		for(i=0; i<systemSize[0]; i++)
+		{
+			for(j=0; j<systemSize[1]; j++)
+			{
+				printf("%s ", deliverySystem[i][j].context);
+			}
+			printf("\n");
+		}
+		
+		for(i=0; i<systemSize[0]; i++)
+		{
+			for(j=0; j<systemSize[1]; j++)
+			{
+				printf("%d ", deliverySystem[i][j].building);
+			}
+			printf("\n");
+		}
+		
+		for(i=0; i<systemSize[0]; i++)
+		{
+			for(j=0; j<systemSize[1]; j++)
+			{
+				printf("%d ", deliverySystem[i][j].room);
+			}
+			printf("\n");
+		}
     
     str_freeSystem();
     
@@ -229,7 +304,7 @@ void str_printStorageStatus(void) {
 		printf("%i|\t",i); // show column
 		for (j=0;j<systemSize[1];j++)
 		{
-			if (deliverySystem[i][j].cnt > 0) // if resident has some packagem then show 
+			if (deliverySystem[i][j].cnt != 0) // if resident has some packagem then show 
 			{
 				printf("%i,%i\t|\t", deliverySystem[i][j].building, deliverySystem[i][j].room);
 			}
