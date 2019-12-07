@@ -55,7 +55,6 @@ static void initStorage(int x, int y) {
 	int i, j;
 	
 	deliverySystem = (storage_t**)malloc(sizeof(storage_t*)*x); // create row
-    printf("malloc check\n");
     
     for(i=0;i<x;i++)
     {
@@ -160,26 +159,12 @@ int str_createSystem(char* filepath) {
     
     //this makes deliverySystem dimension array (like delivery box)
     fp   = fopen(filepath, "r");
-    fscanf( fp, "%d %d", &systemSize[0], &systemSize[1]);
-    initStorage(systemSize[0], systemSize[1]);
-	printf("row column check\n");
-    printf("%d %d\n", systemSize[0], systemSize[1]);
+    fscanf( fp, "%d %d", &systemSize[0], &systemSize[1]); // accept row, column
     
-        //this sets masterPassword
+    initStorage(systemSize[0], systemSize[1]); // initialize the delivery box before creating struct srorage_t
+    
+    //this sets masterPassword
     fscanf(fp, "%s", masterPassword);
-    printf("%s master check\n", masterPassword);
-
-
-//    deliverySystem = (storage_t**)malloc(sizeof(storage_t*)*systemSize[0]); // create row
-//    printf("malloc check\n");
-//    
-//    for(i=0;i<systemSize[0];i++)
-//    {
-//        deliverySystem[i] = (storage_t*)malloc(sizeof(storage_t)*systemSize[1]); // create column
-//    }
-//    
-    printf("malloc second check\n");
-    
     
     while(!feof(fp)) // if file is available
     {
@@ -190,82 +175,16 @@ int str_createSystem(char* filepath) {
         fscanf( fp, "%d %d", &x, &y);//row, column
 
         fscanf( fp, "%d %d %s", &deliverySystem[x][y].building, &deliverySystem[x][y].room, deliverySystem[x][y].passwd);//building, room, passwd
-        deliverySystem[x][y].cnt = 1;
-        printf("cnt check %d\n", deliverySystem[x][y].cnt);
-        printf("put from row to passwd in building\n");
-        //for checking. delete latesly
-        printf("%d\n",deliverySystem[x][y].building);
-        printf("%d\n",deliverySystem[x][y].room);
-    	printf("%s\n",deliverySystem[x][y].passwd);
-        //context
-//        deliverySystem[x][y].context = (char*)malloc(sizeof(char)*20);
-        printf("malloc context check\n");
-        fscanf(fp,"%s",deliverySystem[x][y].context);
-        printf("context check\n");
-        printf("%s\n",deliverySystem[x][y].context);
 
-        //for checking. delete latesly
+		deliverySystem[x][y].cnt = 1; // it means there is a package
+        
+        fscanf(fp,"%s",deliverySystem[x][y].context);
+
 		storedCnt++;
         
     }
-        
-//    for(i=0;i<systemSize[0];i++)
-//    {
-//        for(j=0;j<systemSize[1];j++)
-//        {
-//            free(deliverySystem[i][j].context);
-//        }
-//    }
-    
-    //this is tempor for cheking cnt
-		for(i=0; i<systemSize[0]; i++)
-		{
-			for(j=0; j<systemSize[1]; j++)
-			{
-				printf("%d ", deliverySystem[i][j].cnt);
-			}
-			printf("\n");
-		}
-    
-    
-    for(i=0; i<systemSize[0]; i++)
-		{
-			for(j=0; j<systemSize[1]; j++)
-			{
-				printf("%s ", deliverySystem[i][j].passwd);
-			}
-			printf("\n");
-		}
-		
-		for(i=0; i<systemSize[0]; i++)
-		{
-			for(j=0; j<systemSize[1]; j++)
-			{
-				printf("%s ", deliverySystem[i][j].context);
-			}
-			printf("\n");
-		}
-		
-		for(i=0; i<systemSize[0]; i++)
-		{
-			for(j=0; j<systemSize[1]; j++)
-			{
-				printf("%d ", deliverySystem[i][j].building);
-			}
-			printf("\n");
-		}
-		
-		for(i=0; i<systemSize[0]; i++)
-		{
-			for(j=0; j<systemSize[1]; j++)
-			{
-				printf("%d ", deliverySystem[i][j].room);
-			}
-			printf("\n");
-		}
-    
-    str_freeSystem();
-    
+ 
+    //str_freeSystem(); this makes wrong result;;
     
     fclose(fp);
 
@@ -292,6 +211,8 @@ void str_printStorageStatus(void) {
 	int i, j;
 	printf("----------------------------- Delivery Storage System Status (%i occupied out of %i )-----------------------------\n\n", storedCnt, systemSize[0]*systemSize[1]);
 	
+	
+	
 	printf("\t");
 	for (j=0;j<systemSize[1];j++)
 	{
@@ -307,6 +228,7 @@ void str_printStorageStatus(void) {
 			if (deliverySystem[i][j].cnt != 0) // if resident has some packagem then show 
 			{
 				printf("%i,%i\t|\t", deliverySystem[i][j].building, deliverySystem[i][j].room);
+				
 			}
 			else // cnt == 0 means no package
 			{
