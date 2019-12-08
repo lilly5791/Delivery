@@ -183,6 +183,11 @@ int str_createSystem(char* filepath) {
  
     //str_freeSystem(); this makes wrong result;;
     
+    if(fp == NULL)
+    {
+    	return -1;
+	}
+    
     fclose(fp);
 
 
