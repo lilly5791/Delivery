@@ -101,7 +101,7 @@ static int inputPasswd(int x, int y) {
 //return : 0 - backup was successfully done, -1 - failed to backup
 int str_backupSystem(char* filepath) {
 	FILE *fp;
-   int i,j;
+	int i,j;
 
    fp = fopen(filepath, "w");
    
@@ -120,7 +120,6 @@ int str_backupSystem(char* filepath) {
          if(deliverySystem[i][j].cnt > 0) // if deliverySystem[i][j] has a package
          {
             fprintf(fp, "%d %d %d %d %s ",i,j,deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd);
-
             fprintf(fp, "%s\n",deliverySystem[i][j].context);
          }
          
@@ -310,22 +309,22 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 //return : 0 - successfully extracted, -1 = failed to extract
 int str_extractStorage(int x, int y) {
 	
-	char inputPasswd[PASSWD_LEN+1];
+	char inputPasswd[PASSWD_LEN+1]; // inputPasswd is the one that user input
 	
 	printf("input password for (%d, %d) storage :", x, y);
 	scanf("%s", inputPasswd);
 
 	
 //	inputPasswd(x, y)
-	if(strcmp(deliverySystem[x][y].passwd, inputPasswd))
+	if(strcmp(deliverySystem[x][y].passwd, inputPasswd)) // if user input is correct
 	{
 		printf("extracting the storage (%d, %d)...\n", x, y);
 		printStorageInside(x, y);
-		storedCnt--;
-		initStorage(x, y);
+		storedCnt--; // one box is gone
+		initStorage(x, y); // initialize the storage
 		return 0;
 	}
-	else
+	else // if user input is wrong
 		return -1;
 
 }
@@ -343,7 +342,7 @@ int str_findStorage(int nBuilding, int nRoom) {
 	{
 		for (j=0;j<systemSize[1];j++)
 		{
-			if(nBuilding == deliverySystem[i][j].building && nRoom == deliverySystem[i][j].room)
+			if(nBuilding == deliverySystem[i][j].building && nRoom == deliverySystem[i][j].room) // if user's input information is match
 			{
 				printf("-----------> Found a package in (%d, %d)\n", i, j);
 				check++;
@@ -353,7 +352,7 @@ int str_findStorage(int nBuilding, int nRoom) {
 	
 	
 	
-	if(check == 0)
+	if(check == 0) // when input information is wrong
 	{
 		return 0;
 	}
