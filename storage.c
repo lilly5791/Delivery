@@ -201,14 +201,14 @@ int str_createSystem(char* filepath) {
 void str_freeSystem(void) {
 	int i, j;
 	
-	// free context in each storage
-	for(i=0;i<systemSize[0];i++)
-	{
-		for(j=0;j<systemSize[1];j++)
-		{
-			free(deliverySystem[i][j].context); 
-		}
-	}
+//	// free context in each storage
+//	for(i=0;i<systemSize[0];i++)
+//	{
+//		for(j=0;j<systemSize[1];j++)
+//		{
+//			free(deliverySystem[i][j].context); 
+//		}
+//	}
 	
 	
 	// free all deliverySystem
@@ -308,13 +308,17 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 //int x, int y : coordinate of the cell to extract
 //return : 0 - successfully extracted, -1 = failed to extract
 int str_extractStorage(int x, int y) {
-	
+	int i, j;
 	if(inputPasswd(x, y) == 0) // if user input is correct
 	{
 		printf("extracting the storage (%d, %d)...\n", x, y);
 		printStorageInside(x, y);
 		storedCnt--; // one box is gone
 		initStorage(x, y); // initialize the storage
+		
+		// free context in particular storage
+		free(deliverySystem[x][y].context); 
+	
 		return 0;
 	}
 	else // if user input is wrong
