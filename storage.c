@@ -67,7 +67,7 @@ static void initStorage(int x, int y) {
 static int inputPasswd(int x, int y) {
 	
 	int i;
-	int index=0; // index is for comparing the password. if index = 0 then match, if index = -1 then wrong
+	int index; // index is for comparing the password. if index = 0 then match, if index = -1 then wrong
 	int masterindex; // masterindex is for comparing your input password and masterpassword
 	char pass[PASSWD_LEN+1]; // pass is user's input password
 	
@@ -76,8 +76,6 @@ static int inputPasswd(int x, int y) {
 	
 	index = strcmp(pass, deliverySystem[x][y].passwd);
 	masterindex = strcmp(pass, masterPassword);
-	
-	printf("\nindex %d masterindex %d\n", index, masterindex);
 
 	if(index == 0)
 	{
