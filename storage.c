@@ -51,13 +51,13 @@ static void printStorageInside(int x, int y) {
 //and allocate memory to the context pointer
 //int x, int y : cell coordinate to be initialized
 static void initStorage(int x, int y) {
-
-    	deliverySystem[x][y].building = 0;
-    	deliverySystem[x][y].room = 0;
-    	strcpy(deliverySystem[x][y].passwd, "pass"); // initialize passwd to "pass"
-   		deliverySystem[x][y].cnt = 0;
-   		deliverySystem[x][y].context = (char*)malloc(sizeof(char)*MAX_MSG_SIZE); // create context malloc
-   		strcpy(deliverySystem[x][y].context, "context"); // initialize context to "context"
+	
+	deliverySystem[x][y].building = 0;
+	deliverySystem[x][y].room = 0;
+	strcpy(deliverySystem[x][y].passwd, "pass"); // initialize passwd to "pass"
+	deliverySystem[x][y].cnt = 0;
+	deliverySystem[x][y].context = (char*)malloc(sizeof(char)*MAX_MSG_SIZE); // create context malloc
+	strcpy(deliverySystem[x][y].context, "context"); // initialize context to "context"
 	
 }
 
@@ -66,9 +66,10 @@ static void initStorage(int x, int y) {
 //return : 0 - password is matching, -1 - password is not matching
 static int inputPasswd(int x, int y) {
 	
-	int index; // index is for comparing the password. if index = 0 then match, if index = -1 then wrong
+	int i;
+	int index=0; // index is for comparing the password. if index = 0 then match, if index = -1 then wrong
 	int masterindex; // masterindex is for comparing your input password and masterpassword
-	char pass[PASSWD_LEN+1];
+	char pass[PASSWD_LEN+1]; // pass is user's input password
 	
 	printf("input password for (%d, %d) storage :", x, y);
 	scanf("%s", &pass);
@@ -76,17 +77,20 @@ static int inputPasswd(int x, int y) {
 	index = strcmp(pass, deliverySystem[x][y].passwd);
 	masterindex = strcmp(pass, masterPassword);
 	
-	
-	if(index != 0) // if input password and real password is different
+	printf("\nindex %d masterindex %d\n", index, masterindex);
+
+	if(index == 0)
 	{
-		return masterindex; // compare with master password
+		return 0;
 	}
 	else
 	{
-		return index; // when input password is right
+		if(masterindex == 0)
+			return 0;
+			
+		return -1;
 	}
-	
-	return 0;
+	return -1;
 	
 }
 
@@ -103,27 +107,27 @@ int str_backupSystem(char* filepath) {
 	FILE *fp;
 	int i,j;
 
-   fp = fopen(filepath, "w");
+	fp = fopen(filepath, "w");
    
-   if(fp == NULL) // if failed to backup
-   {
-      return -1;
-   }
-   
+	if(fp == NULL) // if failed to backup
+	{
+		return -1;
+	}
+	
    fprintf(fp, "%d %d\n", systemSize[0], systemSize[1]); // put row, column
    fprintf(fp, "%s\n", masterPassword); // put masterpassword
    
    for(i=0;i<systemSize[0]; i++)
    {
-      for(j=0;j<systemSize[1]; j++)
-      {
-         if(deliverySystem[i][j].cnt > 0) // if deliverySystem[i][j] has a package
-         {
-            fprintf(fp, "%d %d %d %d %s ",i,j,deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd);
-            fprintf(fp, "%s\n",deliverySystem[i][j].context);
-         }
+		for(j=0;j<systemSize[1]; j++)
+    	{
+        	if(deliverySystem[i][j].cnt > 0) // if deliverySystem[i][j] has a package
+        	{
+        		fprintf(fp, "%d %d %d %d %s ",i,j,deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd);
+        		fprintf(fp, "%s\n",deliverySystem[i][j].context);
+        	}
          
-      }
+    	}
       
    }
    
@@ -144,7 +148,7 @@ int str_createSystem(char* filepath) {
     FILE *fp;
     
     //this makes deliverySystem dimension array (like delivery box)
-    fp   = fopen(filepath, "r");
+    fp = fopen(filepath, "r");
     fscanf( fp, "%d %d", &systemSize[0], &systemSize[1]); // accept table row, column
     
     
@@ -173,7 +177,7 @@ int str_createSystem(char* filepath) {
         //from building number to passwd
         
         fscanf( fp, "%d %d", &x, &y);//row, column
-
+		
         fscanf( fp, "%d %d %s", &deliverySystem[x][y].building, &deliverySystem[x][y].room, deliverySystem[x][y].passwd);//building, room, passwd
 
 		deliverySystem[x][y].cnt = 1; // it means there is a package
@@ -281,16 +285,14 @@ int str_checkStorage(int x, int y) {
 //return : 0 - successfully put the package, -1 - failed to put
 int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_SIZE+1], char passwd[PASSWD_LEN+1]) {
 	
+	int i;
+	
 	if(deliverySystem[x][y].cnt == 0) // when the storage is empty input user's informations in the storage
 	{
 		deliverySystem[x][y].building = nBuilding;
 		deliverySystem[x][y].room = nRoom;
 		deliverySystem[x][y].context = msg;
-		for (i=0;i<sizeof(passwd[PASSWD_LEN+1]);i++)
-		{
-			deliverySystem[x][y].passwd[i] = passwd[i]; // put password
-		}
-		
+		strcpy(deliverySystem[x][y].passwd, passwd);		
 		deliverySystem[x][y].cnt=1;
 		storedCnt++;
 	}
@@ -309,14 +311,7 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 //return : 0 - successfully extracted, -1 = failed to extract
 int str_extractStorage(int x, int y) {
 	
-	char inputPasswd[PASSWD_LEN+1]; // inputPasswd is the one that user input
-	
-	printf("input password for (%d, %d) storage :", x, y);
-	scanf("%s", inputPasswd);
-
-	
-//	inputPasswd(x, y)
-	if(strcmp(deliverySystem[x][y].passwd, inputPasswd)) // if user input is correct
+	if(inputPasswd(x, y) == 0) // if user input is correct
 	{
 		printf("extracting the storage (%d, %d)...\n", x, y);
 		printStorageInside(x, y);
@@ -325,7 +320,9 @@ int str_extractStorage(int x, int y) {
 		return 0;
 	}
 	else // if user input is wrong
+	{
 		return -1;
+	}
 
 }
 
